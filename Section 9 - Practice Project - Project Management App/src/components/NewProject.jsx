@@ -1,44 +1,69 @@
-export default function NewProject({setAddProjectSelected}) {
-    function handleProjectSelected(){
-        setAddProjectSelected((prevState) => !prevState);
+import { useRef } from "react";
+import Input from "./Input";
+import Modal from "./Modal";
+
+export default function NewProject({ onAdd, onCancel }) {
+  const modal = useRef();
+
+  const title = useRef();
+  const description = useRef();
+  const dueDate = useRef();
+
+  function handleSave() {
+    const enteredTitle = title.current.value;
+    const enteredDescription = description.current.value;
+    const enteredDueDate = dueDate.current.value;
+
+    if (
+      enteredTitle.trim() === "" ||
+      enteredDescription.trim() === "" ||
+      enteredDueDate.trim() === ""
+    ) {
+      modal.current.open();
+      return;
     }
+
+    onAdd({
+      title: enteredTitle,
+      description: enteredDescription,
+      dueDate: enteredDueDate,
+    });
+  }
+
   return (
-    <div className="flex flex-col justify-center space-y-3 mb-32 w-full pr-20 pl-10">
-      <div className="flex flex-row space-x-3 ml-auto">
-        <button onClick={handleProjectSelected}>Cancel</button>
-        <button className="px-5 py-1.5 text-xs md:text-base rounded-md bg-stone-900 text-stone-100 hover:bg-stone-700 hover:text-stone-100">
-          Save
-        </button>
+    <>
+      <Modal ref={modal} buttonCaption="Okay">
+        <h2 className="text-xl font-bold text-stone-700 my-4">Invalid Input</h2>
+        <p className="text-stone-600 mb-4">You forgot to enter a value</p>
+        <p className="text-stone-600 mb-4">
+          Please make sure you provide a valid value for every input field
+        </p>
+      </Modal>
+      <div className="w-[35rem] mt-16">
+        <menu className="flex items-center justify-end gap-4 my-4">
+          <li>
+            <button
+              className="text-stone-800 hover:text-stone-950"
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+          </li>
+          <li>
+            <button
+              className="px-6 py-2 rounded-md bg-stone-800 text-stone-50 hover:bg-stone-950 "
+              onClick={handleSave}
+            >
+              Save
+            </button>
+          </li>
+        </menu>
+        <div>
+          <Input type="text" ref={title} label="Title" />
+          <Input ref={description} label="Description" textarea />
+          <Input type="date" ref={dueDate} label="Due Date" />
+        </div>
       </div>
-      <div className="flex flex-col items-start space-y-1">
-        <label className="text-xs text-stone-500 font-bold uppercase">
-          Title
-        </label>
-        <input
-          id="content1"
-          type="text"
-          className="bg-stone-200 border-b border-stone-800 p-1 w-full"
-        />
-      </div>
-      <div className="flex flex-col items-start space-y-1">
-        <label className="text-xs text-stone-500 font-bold uppercase">
-          Description
-        </label>
-        <input
-          type="text"
-          className="bg-stone-200 border-b border-stone-800 p-1 w-full"
-        />
-      </div>
-      <div className="flex flex-col items-start space-y-1">
-        <label className="text-xs text-stone-500 font-bold uppercase">
-          Due Date
-        </label>
-        <input
-          id="content1"
-          type="date"
-          className="bg-stone-200 border-b border-stone-800 p-1 w-full"
-        />
-      </div>
-    </div>
+    </>
   );
 }
